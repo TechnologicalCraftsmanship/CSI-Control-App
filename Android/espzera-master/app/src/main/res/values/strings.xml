@@ -1,0 +1,53 @@
+<resources>
+    <string name="app_name">EspZera</string>
+
+    <string name="leituras_button">Leituras</string>
+    <string name="cadastros_button">Cadastros</string>
+    <string name="configuracoes_button">Configurações</string>
+    <string name="add_user_button">Adicionar Usuário</string>
+    <string name="view_users_button">Ver Usuários</string>
+    <string name="usuarios_button">Usuários</string>
+    <string name="ambientes_button">Ambientes</string>
+    <string name="leituras_cadastros_button">Leituras</string>
+    <string name="new_user">Novo Usuário</string>
+    <string name="alter_button">Alterar</string>
+    <string name="delete_button">Excluir</string>
+    <string name="dialog_save_button">Salvar</string>
+    <string name="dialog_cancel_button">Cancelar</string>
+    <string name="yes_button">Sim</string>
+    <string name="no_button">Não</string>
+
+    <string name="cadastros_title">Opções de Cadastros</string>
+    <string name="usuario_manager_title">Gerenciar Usuários</string>
+    <string name="user_id_label">ID:</string>
+    <string name="user_name_label">Nome:</string>
+    <string name="user_nickname_label">Apelido:</string>
+    <string name="user_status_label">Status:</string>
+    <string name="status_label">Status:</string>
+    <string name="dialog_add_user_title">Adicionar Novo Usuário</string>
+    <string name="dialog_edit_user_title">Alterar Usuário</string>
+    <string name="confirm_delete_title">Confirmar Exclusão</string>
+
+    <string name="user_name_hint">Nome do Usuário</string>
+    <string name="user_nickname_hint">Apelido do Usuário</string>
+    <string name="user_status_hint">Status do Usuário (0 ou 1)</string>
+    <string name="splash_screen_image_description">Logotipo do aplicativo ESP</string>
+    <string name="confirm_delete_message">Tem certeza que deseja excluir o usuário %1$s?</string>
+
+    <string name="table_header_name">Nome</string>
+    <string name="table_header_status">Status</string>
+    <string name="table_header_actions">Ações</string>
+    <string name="icon_edit_description">Ícone de Editar</string>
+    <string name="icon_delete_description">Ícone de Excluir</string>
+
+    <string-array name="status_options">
+        <item>0 - Inativo</item>
+        <item>1 - Ativo</item>
+    </string-array>
+
+    <string-array name="auth_types">
+        <item>WPA2-PSK (Pessoal)</item>
+        <item>WPA2-Enterprise (PEAP)</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="2dp" android:paddingBottom="2dp" android:layout_marginBottom="2dp" android:background="@android:color/white"
+    android:elevation="2dp"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/text_view_user_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:text="Nome do Usuário"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:paddingEnd="8dp" />
+
+    <TextView
+        android:id="@+id/text_view_user_status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="1"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:paddingEnd="8dp" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_alter"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="4dp"
+            app:icon="@android:drawable/ic_menu_edit"
+            app:iconTint="@color/design_default_color_primary"
+            app:iconGravity="textStart"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+            android:contentDescription="@string/icon_edit_description" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_delete"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:icon="@android:drawable/ic_menu_delete"
+            app:iconTint="@color/design_default_color_error"
+            app:iconGravity="textStart"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+            android:contentDescription="@string/icon_delete_description" />
+
+    </LinearLayout>
+
+    <!-- O ID e Apelido foram removidos para focar nas colunas solicitadas.
+         Se precisar deles, pode adicioná-los de volta em TextViews menores ou ocultos. -->
+    <TextView
+        android:id="@+id/text_view_user_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" /> <TextView
+    android:id="@+id/text_view_user_nickname"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:visibility="gone" /> </LinearLayout>

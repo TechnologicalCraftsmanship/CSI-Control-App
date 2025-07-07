@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="16dp"
+        tools:context=".CadastrosActivity">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cadastros_title"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:textColor="#3F51B5"
+            android:layout_marginBottom="48dp" />
+
+        <Button
+            android:id="@+id/button_usuarios"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/usuarios_button"
+            android:textSize="20sp"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/button_ambientes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ambientes_button"
+            android:textSize="20sp"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/button_leituras_cadastros"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/leituras_cadastros_button"
+            android:textSize="20sp"
+            android:padding="16dp" />
+
+    </LinearLayout>
+</ScrollView>

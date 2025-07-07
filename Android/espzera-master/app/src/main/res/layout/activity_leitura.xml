@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F3F4F6" tools:context=".CollectionActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tela de Leitura e Medição Interativa"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#1F2937" android:layout_marginBottom="24dp"
+            android:textAlignment="center"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Largura:"
+                android:textSize="18sp"
+                android:textColor="#374151" android:layout_marginEnd="8dp"/>
+
+            <EditText
+                android:id="@+id/gridWidth"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:minHeight="48dp"
+                android:text="10"
+                android:maxLength="2"
+                android:gravity="center"
+                android:background="@drawable/rounded_edittext_background"
+                android:padding="8dp"
+                android:layout_marginEnd="16dp"
+                android:textColor="#000000" /> <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Altura:"
+            android:textSize="18sp"
+            android:textColor="#374151" android:layout_marginEnd="8dp"/>
+
+            <EditText
+                android:id="@+id/gridHeight"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:minHeight="48dp"
+                android:text="10"
+                android:maxLength="2"
+                android:gravity="center"
+                android:background="@drawable/rounded_edittext_background"
+                android:padding="8dp"
+                android:textColor="#000000" /> </LinearLayout>
+
+        <Button
+            android:id="@+id/generateGridBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gerar Grade"
+            android:backgroundTint="#2563EB" android:textColor="#FFFFFF"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:layout_marginBottom="24dp"
+            app:cornerRadius="8dp"
+            android:elevation="4dp"/>
+
+        <GridLayout
+            android:id="@+id/gridContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="10"
+            android:rowCount="10"
+            android:background="#F9FAFB" android:padding="1dp"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintDimensionRatio="H,1:1"
+            android:elevation="2dp"
+            android:useDefaultMargins="false"
+            android:alignmentMode="alignBounds"
+            android:columnOrderPreserved="false"
+            android:rowOrderPreserved="false"
+            android:layout_gravity="center_horizontal"
+            android:maxHeight="500dp" /> <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ponto Clicado: "
+        android:textSize="18sp"
+        android:textColor="#374151" android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/clickedCoordinates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nenhum"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#1D4ED8" android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/messageBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#DC2626" android:textSize="16sp"
+            android:layout_marginBottom="24dp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tempo de Coleta (segundos):"
+                android:textSize="18sp"
+                android:textColor="#374151" android:layout_marginEnd="8dp"/>
+
+            <EditText
+                android:id="@+id/collectionTime"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:minHeight="48dp"
+                android:text="5"
+                android:maxLength="2"
+                android:gravity="center"
+                android:background="@drawable/rounded_edittext_background"
+                android:padding="8dp"
+                android:textColor="#000000" /> </LinearLayout>
+
+        <Button
+            android:id="@+id/startButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Iniciar Coleta"
+            android:backgroundTint="#16A34A" android:textColor="#FFFFFF"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:enabled="false"
+            app:cornerRadius="8dp"
+            android:elevation="4dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Status da Coleta: "
+            android:textSize="18sp"
+            android:textColor="#374151" android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:id="@+id/collectionStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Aguardando..."
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#4B5563" android:layout_marginBottom="16dp"/>
+
+    </LinearLayout>
+</ScrollView>
