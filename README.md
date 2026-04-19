@@ -9,6 +9,8 @@ The system is composed of three primary components that work in synergy:
 1.  **ESP32 Receiver Node (Firmware):** The embedded software running on an ESP32 microcontroller, responsible for Wi-Fi connectivity, traffic generation, CSI extraction, and data transmission.
 2.  **CSI Collector Desktop Application (`csicollector.py`):** A Python-based desktop application (built with Flet) that serves as a robust control station for configuring the ESP32, initiating/terminating data collection sessions, and saving received CSI data.
 3.  **CSI Collector Mobile Application (Android):** A native Android application that offers a portable and convenient way to perform the same provisioning and data collection tasks as the desktop application, directly from your Android device.
+4. **Dataset:** A dedicated folder containing the raw, compressed Channel State Information (CSI) `.csv` files collected during various experimental scenarios.
+5. **Training Script:** A highly configurable machine learning pipeline (`training.py`) used to preprocess the raw CSI data, extract features, and dynamically train classification models (e.g., CNNs, BiLSTMs).
 
 ## System Components
 
