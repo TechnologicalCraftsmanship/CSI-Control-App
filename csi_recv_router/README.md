@@ -1,5 +1,9 @@
 # Recv router CSI example
 
+> **Acknowledgment & Project Context:** > This firmware takes as its starting point the [ESP-CSI Recv Router Example](https://github.com/espressif/esp-csi/tree/master/examples/get-started/csi_recv_router) provided by Espressif. It has been specifically modified to integrate with our broader project objectives—primarily routing and sending the acquired Channel State Information (CSI) data to the main data acquisition application. 
+> 
+> For the foundational documentation and unedited instructions regarding the base example, please refer to the [original README file](https://github.com/espressif/esp-csi/blob/master/examples/get-started/csi_recv_router/README.md).
+
 (See the README.md file in the upper level 'examples' directory for more information about examples.)
 
 The device triggers the router to send packets through the Ping command to obtain the CSI data between the device and the router
