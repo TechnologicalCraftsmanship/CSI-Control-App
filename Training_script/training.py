@@ -1331,88 +1331,94 @@ class MyModel:
                 print("Error: One of the sets (Train/Val/Test) is empty. Check file contents.")
                 return False
         # --- NEW BLOCK END ---
-        # --- STRATEGY 4: STRATIFIED BY CLASS (PER FILE) ---
+        # --- STRATEGY 4: STRATIFIED BY CLASS (PER FILE AND PER POSITION) ---
         elif self.split_strategy == 'stratified_by_class' or self.split_strategy == 'stratified_by_class_no_shuffle':
 
-            print("Criando sequências estratificadas por classe (e por arquivo)...")
+            print("Criando sequências estratificadas por classe, arquivo e posição...")
             
-            # Obter todos os IDs de arquivos únicos no dataset
+            # Obter todos os IDs de arquivos E posições únicas no dataset
             unique_files = np.unique(source_file_data)
+            unique_positions = np.unique(position_data) # <--- NEW: Grab spatial identifiers
 
             for class_idx in self.label_indices:
-                # Iterate over unique files WITHIN this class to maintain per-user temporal logic
+                # Iterate over unique files 
                 for file_id in unique_files:
-                    
-                    # Find indices matching BOTH the class and the specific file
-                    class_file_indices = np.where((y_data_encoded == class_idx) & (source_file_data == file_id))[0]
-
-                    # Check for minimum length needed for a 70/10/20 split and sequence creation
-                    if len(class_file_indices) < (self.chunksize * 5): 
-                        continue
-
-                    # 1. GET THE RAW TIME SERIES DATA FOR THIS SPECIFIC CLASS AND USER
-                    X_class_file = X_data_unscaled[class_file_indices]
-                    y_class_file = y_data_encoded[class_file_indices]
-                    
-                    # =========================================================
-                    # Branch between Sanity Check and Standard Split
-                    # =========================================================
-                    
-                    if SANITY_CHECK:
-                        # --- SANITY CHECK MODE (High Leakage) ---
-                        current_step = max(1, self.chunksize // 4) 
-                        X_seq_all, y_seq_all = create_sequences(X_class_file, y_class_file, self.chunksize, step=current_step)
+                    # Iterate over unique positions WITHIN the file to ensure spatial coverage
+                    for pos_id in unique_positions:
                         
-                        if len(X_seq_all) > 0:
-                            # SHUFFLE sequences (Mixes time steps randomly -> Data Leakage)
-                            X_seq_all, y_seq_all = shuffle(X_seq_all, y_seq_all, random_state=42)
-                            
-                            train_end = int(len(X_seq_all) * 0.7)
-                            val_end = int(len(X_seq_all) * 0.8)
-                            
-                            X_train_list.append(X_seq_all[:train_end])
-                            y_train_list.append(y_seq_all[:train_end])
-                            
-                            X_val_list.append(X_seq_all[train_end:val_end])
-                            y_val_list.append(y_seq_all[train_end:val_end])
-                            
-                            X_test_list.append(X_seq_all[val_end:])
-                            y_test_list.append(y_seq_all[val_end:])
-                    
-                    else:
-                        # --- STANDARD MODE (Strict Temporal Split Per User/Class) ---
-                        # 2. SPLIT THE RAW DATA TEMPORALLY FIRST (No Leakage)
-                        train_end_raw = int(len(X_class_file) * 0.7)
-                        val_end_raw = int(len(X_class_file) * 0.8) 
-                        
-                        # Training block
-                        X_train_raw = X_class_file[:train_end_raw]
-                        y_train_raw = y_class_file[:train_end_raw]
-                        
-                        # Validation block
-                        X_val_raw = X_class_file[train_end_raw:val_end_raw]
-                        y_val_raw = y_class_file[train_end_raw:val_end_raw]
-                        
-                        # Test block
-                        X_test_raw = X_class_file[val_end_raw:]
-                        y_test_raw = y_class_file[val_end_raw:]
+                        # Find indices matching Class AND File AND Position
+                        class_file_indices = np.where(
+                            (y_data_encoded == class_idx) & 
+                            (source_file_data == file_id) &
+                            (position_data == pos_id)
+                        )[0]
 
-                        # 3. CREATE SEQUENCES SEPARATELY
-                        current_step = max(1, self.chunksize // 4) 
-                        X_train_seq, y_train_seq = create_sequences(X_train_raw, y_train_raw, self.chunksize, step=current_step)
-                        X_val_seq, y_val_seq = create_sequences(X_val_raw, y_val_raw, self.chunksize, step=current_step)
-                        X_test_seq, y_test_seq = create_sequences(X_test_raw, y_test_raw, self.chunksize, step=current_step)
+                        # Because we are slicing smaller blocks now, slightly lower the sequence threshold
+                        if len(class_file_indices) < (self.chunksize * 3): 
+                            continue
 
-                        # 4. APPEND
-                        if len(X_train_seq) > 0:
-                            X_train_list.append(X_train_seq)
-                            y_train_list.append(y_train_seq)
-                        if len(X_val_seq) > 0:
-                            X_val_list.append(X_val_seq)
-                            y_val_list.append(y_val_seq)
-                        if len(X_test_seq) > 0:
-                            X_test_list.append(X_test_seq)
-                            y_test_list.append(y_test_seq)
+                        # 1. GET THE RAW TIME SERIES DATA FOR THIS SPECIFIC CHAIR/LOCATION
+                        X_class_file = X_data_unscaled[class_file_indices]
+                        y_class_file = y_data_encoded[class_file_indices]
+                        
+                        # =========================================================
+                        # Branch between Sanity Check and Standard Split
+                        # =========================================================
+                        
+                        if SANITY_CHECK:
+                            # --- SANITY CHECK MODE (High Leakage) ---
+                            current_step = max(1, self.chunksize // 4) 
+                            X_seq_all, y_seq_all = create_sequences(X_class_file, y_class_file, self.chunksize, step=current_step)
+                            
+                            if len(X_seq_all) > 0:
+                                X_seq_all, y_seq_all = shuffle(X_seq_all, y_seq_all, random_state=42)
+                                
+                                train_end = int(len(X_seq_all) * 0.7)
+                                val_end = int(len(X_seq_all) * 0.8)
+                                
+                                X_train_list.append(X_seq_all[:train_end])
+                                y_train_list.append(y_seq_all[:train_end])
+                                
+                                X_val_list.append(X_seq_all[train_end:val_end])
+                                y_val_list.append(y_seq_all[train_end:val_end])
+                                
+                                X_test_list.append(X_seq_all[val_end:])
+                                y_test_list.append(y_seq_all[val_end:])
+                        
+                        else:
+                            # --- STANDARD MODE (Strict Temporal Split Per User/Class/Position) ---
+                            # 2. SPLIT THE RAW DATA TEMPORALLY FIRST (No Leakage)
+                            train_end_raw = int(len(X_class_file) * 0.7)
+                            val_end_raw = int(len(X_class_file) * 0.8) 
+                            
+                            # Training block
+                            X_train_raw = X_class_file[:train_end_raw]
+                            y_train_raw = y_class_file[:train_end_raw]
+                            
+                            # Validation block
+                            X_val_raw = X_class_file[train_end_raw:val_end_raw]
+                            y_val_raw = y_class_file[train_end_raw:val_end_raw]
+                            
+                            # Test block
+                            X_test_raw = X_class_file[val_end_raw:]
+                            y_test_raw = y_class_file[val_end_raw:]
+
+                            # 3. CREATE SEQUENCES SEPARATELY
+                            current_step = max(1, self.chunksize // 4) 
+                            X_train_seq, y_train_seq = create_sequences(X_train_raw, y_train_raw, self.chunksize, step=current_step)
+                            X_val_seq, y_val_seq = create_sequences(X_val_raw, y_val_raw, self.chunksize, step=current_step)
+                            X_test_seq, y_test_seq = create_sequences(X_test_raw, y_test_raw, self.chunksize, step=current_step)
+
+                            # 4. APPEND
+                            if len(X_train_seq) > 0:
+                                X_train_list.append(X_train_seq)
+                                y_train_list.append(y_train_seq)
+                            if len(X_val_seq) > 0:
+                                X_val_list.append(X_val_seq)
+                                y_val_list.append(y_val_seq)
+                            if len(X_test_seq) > 0:
+                                X_test_list.append(X_test_seq)
+                                y_test_list.append(y_test_seq)
                         
 
             # Combina todas as sequências de classe em um único dataset
