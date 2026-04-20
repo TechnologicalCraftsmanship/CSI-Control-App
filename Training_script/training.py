@@ -1331,102 +1331,106 @@ class MyModel:
                 print("Error: One of the sets (Train/Val/Test) is empty. Check file contents.")
                 return False
         # --- NEW BLOCK END ---
+        # --- STRATEGY 4: STRATIFIED BY CLASS (PER FILE) ---
         elif self.split_strategy == 'stratified_by_class' or self.split_strategy == 'stratified_by_class_no_shuffle':
 
-            print("Criando sequências estratificadas por classe (método corrigido)...")
+            print("Criando sequências estratificadas por classe (e por arquivo)...")
+            
+            # Obter todos os IDs de arquivos únicos no dataset
+            unique_files = np.unique(source_file_data)
 
             for class_idx in self.label_indices:
-                class_indices = np.where(y_data_encoded == class_idx)[0]
-
-                if len(class_indices) == 0:
-                    continue
-
-                # 1. GET THE RAW TIME SERIES DATA FOR THIS CLASS
-                X_class = X_data_unscaled[class_indices]
-                y_class = y_data_encoded[class_indices]
-                
-                # Check for minimum length needed for a 70/10/20 split and sequence creation
-                if len(X_class) < (self.chunksize * 5): # Ensure enough raw data points
-                    continue
-                # =========================================================
-                # NEW LOGIC: Branch between Sanity Check and Standard Split
-                # =========================================================
-                
-                if SANITY_CHECK:
-                    # --- SANITY CHECK MODE (High Leakage) ---
-                    # 1. Create sequences from the ENTIRE continuous block first
-                    #X_seq_all, y_seq_all = create_sequences(X_class, y_class, self.chunksize)
-                    # Define step size. 1 = Max Overlap (Huge RAM), 32 = Moderate Overlap (Low RAM)
-                    # Using chunksize // 4 gives 75% overlap, which is a good balance.
-                    current_step = max(1, self.chunksize // 4) 
-                    X_seq_all, y_seq_all = create_sequences(X_class, y_class, self.chunksize, step=current_step)
-
+                # Iterate over unique files WITHIN this class to maintain per-user temporal logic
+                for file_id in unique_files:
                     
-                    if len(X_seq_all) > 0:
-                        # 2. SHUFFLE sequences (Mixes time steps randomly -> Data Leakage)
-                        X_seq_all, y_seq_all = shuffle(X_seq_all, y_seq_all, random_state=42)
+                    # Find indices matching BOTH the class and the specific file
+                    class_file_indices = np.where((y_data_encoded == class_idx) & (source_file_data == file_id))[0]
+
+                    # Check for minimum length needed for a 70/10/20 split and sequence creation
+                    if len(class_file_indices) < (self.chunksize * 5): 
+                        continue
+
+                    # 1. GET THE RAW TIME SERIES DATA FOR THIS SPECIFIC CLASS AND USER
+                    X_class_file = X_data_unscaled[class_file_indices]
+                    y_class_file = y_data_encoded[class_file_indices]
+                    
+                    # =========================================================
+                    # Branch between Sanity Check and Standard Split
+                    # =========================================================
+                    
+                    if SANITY_CHECK:
+                        # --- SANITY CHECK MODE (High Leakage) ---
+                        current_step = max(1, self.chunksize // 4) 
+                        X_seq_all, y_seq_all = create_sequences(X_class_file, y_class_file, self.chunksize, step=current_step)
                         
-                        # 3. Split based on indices
-                        train_end = int(len(X_seq_all) * 0.7)
-                        val_end = int(len(X_seq_all) * 0.8)
-                        
-                        X_train_list.append(X_seq_all[:train_end])
-                        y_train_list.append(y_seq_all[:train_end])
-                        
-                        X_val_list.append(X_seq_all[train_end:val_end])
-                        y_val_list.append(y_seq_all[train_end:val_end])
-                        
-                        X_test_list.append(X_seq_all[val_end:])
-                        y_test_list.append(y_seq_all[val_end:])
-                
-                else:
-                    # --- STANDARD MODE (Strict Temporal Split) ---
-                    # 2. SPLIT THE RAW DATA TEMPORALLY FIRST (No Leakage)
-                    train_end_raw = int(len(X_class) * 0.7)
-                    val_end_raw = int(len(X_class) * 0.8) 
+                        if len(X_seq_all) > 0:
+                            # SHUFFLE sequences (Mixes time steps randomly -> Data Leakage)
+                            X_seq_all, y_seq_all = shuffle(X_seq_all, y_seq_all, random_state=42)
+                            
+                            train_end = int(len(X_seq_all) * 0.7)
+                            val_end = int(len(X_seq_all) * 0.8)
+                            
+                            X_train_list.append(X_seq_all[:train_end])
+                            y_train_list.append(y_seq_all[:train_end])
+                            
+                            X_val_list.append(X_seq_all[train_end:val_end])
+                            y_val_list.append(y_seq_all[train_end:val_end])
+                            
+                            X_test_list.append(X_seq_all[val_end:])
+                            y_test_list.append(y_seq_all[val_end:])
                     
-                    # Training block
-                    X_train_raw = X_class[:train_end_raw]
-                    y_train_raw = y_class[:train_end_raw]
-                    
-                    # Validation block
-                    X_val_raw = X_class[train_end_raw:val_end_raw]
-                    y_val_raw = y_class[train_end_raw:val_end_raw]
-                    
-                    # Test block
-                    X_test_raw = X_class[val_end_raw:]
-                    y_test_raw = y_class[val_end_raw:]
+                    else:
+                        # --- STANDARD MODE (Strict Temporal Split Per User/Class) ---
+                        # 2. SPLIT THE RAW DATA TEMPORALLY FIRST (No Leakage)
+                        train_end_raw = int(len(X_class_file) * 0.7)
+                        val_end_raw = int(len(X_class_file) * 0.8) 
+                        
+                        # Training block
+                        X_train_raw = X_class_file[:train_end_raw]
+                        y_train_raw = y_class_file[:train_end_raw]
+                        
+                        # Validation block
+                        X_val_raw = X_class_file[train_end_raw:val_end_raw]
+                        y_val_raw = y_class_file[train_end_raw:val_end_raw]
+                        
+                        # Test block
+                        X_test_raw = X_class_file[val_end_raw:]
+                        y_test_raw = y_class_file[val_end_raw:]
 
-                    # 3. CREATE SEQUENCES SEPARATELY
-                    current_step = max(1, self.chunksize // 4) 
-                    X_train_seq, y_train_seq = create_sequences(X_train_raw, y_train_raw, self.chunksize, step=current_step)
-                    X_val_seq, y_val_seq = create_sequences(X_val_raw, y_val_raw, self.chunksize, step=current_step)
-                    X_test_seq, y_test_seq = create_sequences(X_test_raw, y_test_raw, self.chunksize, step=current_step)
+                        # 3. CREATE SEQUENCES SEPARATELY
+                        current_step = max(1, self.chunksize // 4) 
+                        X_train_seq, y_train_seq = create_sequences(X_train_raw, y_train_raw, self.chunksize, step=current_step)
+                        X_val_seq, y_val_seq = create_sequences(X_val_raw, y_val_raw, self.chunksize, step=current_step)
+                        X_test_seq, y_test_seq = create_sequences(X_test_raw, y_test_raw, self.chunksize, step=current_step)
 
-                    # 4. APPEND
-                    if len(X_train_seq) > 0:
-                        X_train_list.append(X_train_seq)
-                        y_train_list.append(y_train_seq)
-                    if len(X_val_seq) > 0:
-                        X_val_list.append(X_val_seq)
-                        y_val_list.append(y_val_seq)
-                    if len(X_test_seq) > 0:
-                        X_test_list.append(X_test_seq)
-                        y_test_list.append(y_test_seq)
-                    
+                        # 4. APPEND
+                        if len(X_train_seq) > 0:
+                            X_train_list.append(X_train_seq)
+                            y_train_list.append(y_train_seq)
+                        if len(X_val_seq) > 0:
+                            X_val_list.append(X_val_seq)
+                            y_val_list.append(y_val_seq)
+                        if len(X_test_seq) > 0:
+                            X_test_list.append(X_test_seq)
+                            y_test_list.append(y_test_seq)
+                        
 
             # Combina todas as sequências de classe em um único dataset
-            self.X_train = np.concatenate(X_train_list, axis=0)
-            self.y_train = np.concatenate(y_train_list, axis=0)
-            del X_train_list, y_train_list
+            if X_train_list and X_val_list and X_test_list:
+                self.X_train = np.concatenate(X_train_list, axis=0)
+                self.y_train = np.concatenate(y_train_list, axis=0)
+                del X_train_list, y_train_list
 
-            self.X_val = np.concatenate(X_val_list, axis=0)
-            self.y_val = np.concatenate(y_val_list, axis=0)
-            del X_val_list, y_val_list
+                self.X_val = np.concatenate(X_val_list, axis=0)
+                self.y_val = np.concatenate(y_val_list, axis=0)
+                del X_val_list, y_val_list
 
-            self.X_test = np.concatenate(X_test_list, axis=0)
-            self.y_test = np.concatenate(y_test_list, axis=0)
-            del X_test_list, y_test_list
+                self.X_test = np.concatenate(X_test_list, axis=0)
+                self.y_test = np.concatenate(y_test_list, axis=0)
+                del X_test_list, y_test_list
+            else:
+                print("Erro: Nenhuma sequência foi criada para um dos conjuntos. Verifique a estratégia ou o chunksize.")
+                return False
         # --- FIM DA LÓGICA CONDICIONAL ---
 
         #if not X_train_list or not X_test_list: # <-- Ver se ambos têm dados
